@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import TaskFilter from '../TaskFilter/TaskFilter';
 import type { FilterStatus } from '../TaskFilter/TaskFilter';
-import { TaskItem } from '../TaskItem/TaskItem';
+import { TaskItem } from '../TaskList/TaskItem';
 import type { Task } from '../../types/index';
 import styles from './TaskList.module.css';
 
 const initialTasks: Task[] = [
-  { id: 't1', name: 'Wash dishes', isCompleted: false, priority: 'medium' },
-  { id: 't2', name: 'Mow grass', isCompleted: false, priority: 'high' },
-  { id: 't3', name: 'Take out trash', isCompleted: true, priority: 'low' },
+  { id: 't1', name: 'Wash dishes', isCompleted: false, priority: 'medium', status: 'pending', description: 'Clean all the dishes in the sink', dueDate: '2024-07-01' },
+  { id: 't2', name: 'Mow grass', isCompleted: false, priority: 'high', status: 'pending', description: 'Mow the front and back lawn', dueDate: '2024-07-02' },
+  { id: 't3', name: 'Take out trash', isCompleted: true, priority: 'low', status: 'completed', description: 'Take the trash out to the curb', dueDate: '2024-06-30' },
 ];
 
 function TaskList() {

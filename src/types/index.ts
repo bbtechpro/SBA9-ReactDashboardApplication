@@ -4,7 +4,6 @@ export interface Task {
   id: string;
   name: string;
   isCompleted: boolean;
-  title: string;
   description: string;
   status: TaskStatus;
   priority: 'low' | 'medium' | 'high';

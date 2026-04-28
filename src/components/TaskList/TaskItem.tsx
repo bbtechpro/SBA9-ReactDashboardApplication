@@ -35,4 +35,4 @@ export const TaskItem = ({ task, onToggle, onDelete }: Props) => {
             </button>
         </div>
     </li>);
-}   
+}
