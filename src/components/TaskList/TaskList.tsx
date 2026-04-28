@@ -56,5 +56,22 @@ function TaskList() {
     </div>
   );
 }
+// 1. Define the weights outside the component
+const PRIORITY_WEIGHTS: Record<string, number> = {
+  high: 1,
+  medium: 2,
+  low: 3,
+};
+
+// 2. Sort the filtered results
+const sortedFilteredTasks = [...filteredTasks].sort((a, b) => {
+  return PRIORITY_WEIGHTS[a.priority] - PRIORITY_WEIGHTS[b.priority];
+});
+
+// 3. Map over 'sortedFilteredTasks' instead of 'filteredTasks'
+{sortedFilteredTasks.map((task) => (
+  <TaskItem key={task.id} task={task} ... />
+))}
+
 
 export default TaskList;
