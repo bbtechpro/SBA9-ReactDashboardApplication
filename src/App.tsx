@@ -1,5 +1,5 @@
 import './App.css'
-import TaskList from './components/TaskList/TaskList';
+import { TaskDashboard } from './components/Dashboard/Dashboard';
 
 
 function App() {
@@ -7,7 +7,7 @@ function App() {
     <section id="center">
       <h1>Task Manager</h1>
       <div className="card">
-        <TaskList />
+        <TaskDashboard />
       </div>
     </section>
   );

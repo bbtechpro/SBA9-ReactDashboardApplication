@@ -1,30 +1,85 @@
 import { useState } from 'react';
-import { useMemo } from 'react';
 import TaskList from '../TaskList/TaskList';
-import Stats from '../Stats/Stats';
+import { Stats } from '../Stats/Stats';
 import type { Task } from '../../types/index';
-import styles from './TaskDashboard.module.css';
-import initialTasks from '../TaskList/TaskList'; // Import initial tasks from TaskList for demo purposes
+
+const initialTasks: Task[] = [
+  {
+    id: 't1',
+    name: 'Wash dishes',
+    isCompleted: false,
+    priority: 'medium',
+    status: 'pending',
+    description: 'Clean all the dishes in the sink',
+    dueDate: '2024-07-01',
+  },
+  {
+    id: 't2',
+    name: 'Mow grass',
+    isCompleted: false,
+    priority: 'high',
+    status: 'pending',
+    description: 'Mow the front and back lawn',
+    dueDate: '2024-07-02',
+  },
+  {
+    id: 't3',
+    name: 'Take out trash',
+    isCompleted: true,
+    priority: 'low',
+    status: 'completed',
+    description: 'Take the trash out to the curb',
+    dueDate: '2024-06-30',
+  },
+];
 
 export const TaskDashboard = () => {
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
 
-  // Communications: Handlers passed down to TaskList -> TaskItem
   const handleToggle = (id: string) => {
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, isCompleted: !t.isCompleted } : t));
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === id
+          ? {
+              ...task,
+              isCompleted: !task.isCompleted,
+              status: task.isCompleted ? 'pending' : 'completed',
+            }
+          : task
+      )
+    );
   };
 
   const handleDelete = (id: string) => {
-    setTasks(prev => prev.filter(t => t.id !== id));
+    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+  };
+
+  const handleAddTask = (taskData: Pick<Task, 'name' | 'description' | 'priority' | 'dueDate'>) => {
+    const newTask: Task = {
+      id: `t${Date.now()}`,
+      name: taskData.name.trim(),
+      description: taskData.description.trim(),
+      priority: taskData.priority,
+      dueDate: taskData.dueDate,
+      isCompleted: false,
+      status: 'pending',
+    };
+
+    setTasks((prevTasks) => [newTask, ...prevTasks]);
   };
 
   return (
-    <div className={styles.dashboardGrid}>
-      <aside className={styles.sidebar}>
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
+      <aside>
         <Stats tasks={tasks} />
       </aside>
-      <main className={styles.main}>
-        <TaskList tasks={tasks} onToggle={handleToggle} onDelete={handleDelete} />
+      <main>
+        <TaskList
+          tasks={tasks}
+          onToggle={handleToggle}
+          onDelete={handleDelete}
+          onAddTask={handleAddTask}
+        />
       </main>
     </div>
   );

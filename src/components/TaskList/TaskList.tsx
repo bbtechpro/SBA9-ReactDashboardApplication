@@ -1,77 +1,84 @@
 import { useState } from 'react';
 import TaskFilter from '../TaskFilter/TaskFilter';
-import type { FilterStatus } from '../TaskFilter/TaskFilter';
 import { TaskItem } from '../TaskList/TaskItem';
 import type { Task } from '../../types/index';
-import styles from './TaskList.module.css';
+import { TaskForm } from '../TaskForm/TaskForm';
+import {
+  filterTasks,
+  sortTasks,
+  type FilterStatus,
+  type SortDirection,
+  type SortField,
+} from '../../utils/TaskUtils';
 
-const initialTasks: Task[] = [
-  { id: 't1', name: 'Wash dishes', isCompleted: false, priority: 'medium', status: 'pending', description: 'Clean all the dishes in the sink', dueDate: '2024-07-01' },
-  { id: 't2', name: 'Mow grass', isCompleted: false, priority: 'high', status: 'pending', description: 'Mow the front and back lawn', dueDate: '2024-07-02' },
-  { id: 't3', name: 'Take out trash', isCompleted: true, priority: 'low', status: 'completed', description: 'Take the trash out to the curb', dueDate: '2024-06-30' },
-];
+interface TaskListProps {
+  tasks: Task[];
+  onToggle: (id: string) => void;
+  onDelete: (id: string) => void;
+  onAddTask: (taskData: Pick<Task, 'name' | 'description' | 'priority' | 'dueDate'>) => void;
+}
 
-function TaskList() {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+function TaskList({ tasks, onToggle, onDelete, onAddTask }: TaskListProps) {
   const [filter, setFilter] = useState<FilterStatus>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortField, setSortField] = useState<SortField>('priority');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
-  const handleToggle = (id: string) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task.id === id ? { ...task, isCompleted: !task.isCompleted } : task
-      )
-    );
-  };
-
-  const handleDelete = (id: string) => {
-    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
-  };
-
-  const filteredTasks = tasks.filter((task) => {
-    if (filter === 'active') return !task.isCompleted;
-    if (filter === 'completed') return task.isCompleted;
-    return true;
+  const filteredTasks = filterTasks(tasks, { status: filter, searchTerm });
+  const sortedFilteredTasks = sortTasks(filteredTasks, {
+    field: sortField,
+    direction: sortDirection,
   });
 
   return (
     <div>
       <h2>Tasks</h2>
+      <TaskForm onSave={onAddTask} />
       <TaskFilter currentFilter={filter} onFilterChange={setFilter} />
+      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(event) => setSearchTerm(event.target.value)}
+          placeholder="Search tasks..."
+          aria-label="Search tasks"
+        />
+        <select
+          value={sortField}
+          onChange={(event) => setSortField(event.target.value as SortField)}
+          aria-label="Sort field"
+        >
+          <option value="priority">Priority</option>
+          <option value="dueDate">Due date</option>
+          <option value="name">Name</option>
+        </select>
+        <select
+          value={sortDirection}
+          onChange={(event) => setSortDirection(event.target.value as SortDirection)}
+          aria-label="Sort direction"
+        >
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </div>
 
-      <ul className={styles.taskList}>
-        {filteredTasks.map((task) => (
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '0.75rem' }}>
+        {sortedFilteredTasks.map((task) => (
           <TaskItem
             key={task.id}
             task={task}
-            onToggle={handleToggle}
-            onDelete={handleDelete}
+            onToggle={onToggle}
+            onDelete={onDelete}
           />
         ))}
       </ul>
 
       {tasks.length === 0 && <p>No tasks left! Great job.</p>}
-      {tasks.length > 0 && filteredTasks.length === 0 && (
+      {tasks.length > 0 && sortedFilteredTasks.length === 0 && (
         <p>No tasks match this filter.</p>
       )}
     </div>
   );
 }
-// 1. Define the weights outside the component
-const PRIORITY_WEIGHTS: Record<string, number> = {
-  high: 1,
-  medium: 2,
-  low: 3,
-};
-
-// 2. Sort the filtered results
-const sortedFilteredTasks = [...filteredTasks].sort((a, b) => {
-  return PRIORITY_WEIGHTS[a.priority] - PRIORITY_WEIGHTS[b.priority];
-});
-
-// 3. Map over 'sortedFilteredTasks' instead of 'filteredTasks'
-{sortedFilteredTasks.map((task) => (
-  <TaskItem key={task.id} task={task} ... />
-))}
-
 
 export default TaskList;
